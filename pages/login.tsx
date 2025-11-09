@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { storage } from '../utils/storage';
+import { initializeTestData, resetToTestData } from '../utils/testData';
 import Button from '../components/Button';
 
 export default function Login() {
@@ -10,6 +11,10 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    initializeTestData();
+  }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,12 +135,20 @@ export default function Login() {
           </div>
 
           <div className="mt-6 pt-6 border-t border-gray-200">
-            <button
-              onClick={createDemoAdmin}
-              className="w-full text-sm text-gray-600 hover:text-gray-800"
-            >
-              Create Demo Admin Account
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={createDemoAdmin}
+                className="w-full text-sm text-gray-600 hover:text-gray-800"
+              >
+                Create Demo Admin Account
+              </button>
+              <button
+                onClick={resetToTestData}
+                className="w-full px-4 py-2 bg-green-50 text-green-700 border border-green-200 rounded-lg text-sm font-medium hover:bg-green-100 transition"
+              >
+                Load Test Accounts & Data
+              </button>
+            </div>
           </div>
         </div>
       </div>

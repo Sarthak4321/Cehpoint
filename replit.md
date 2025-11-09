@@ -12,7 +12,12 @@ The portal is fully functional with local storage. All core features are working
 - Demo task evaluation
 - Policy pages
 
-## Recent Changes
+## Recent Changes (November 9, 2024)
+- **UI/UX Polish**: Enhanced with professional animations, gradient backgrounds, and smooth transitions
+- **Tailwind CSS**: Downgraded to v3.4.1 for PostCSS compatibility (v4 had issues)
+- **Custom Animations**: Added fadeIn, slideInRight, moveGrid, and btn-shimmer effects
+- **Button Enhancement**: Improved with hover effects, scale transforms, and shimmer animations
+- **Critical Fix**: Resolved click-blocking issue with animated background (pointer-events: none)
 - **Authentication System**: Complete signup/login with knowledge checks using Gemini AI
 - **Worker Dashboard**: Profile, tasks, payments, withdrawal features
 - **Admin Dashboard**: Worker management, task broadcasting, approval system
@@ -20,29 +25,74 @@ The portal is fully functional with local storage. All core features are working
 - **Payment System**: Track earnings, process withdrawals
 - **Policy Pages**: Terms, Privacy, Payment, Termination policies
 
-## Demo Credentials
+## Demo Credentials & Test Data
 
-### Admin Account
+### Quick Start (Recommended)
+**Easiest Way to Get Started:**
+1. Go to the login page (`/login`)
+2. Click the green "Load Test Accounts & Data" button
+3. This will load 5 pre-configured worker accounts + 1 admin with realistic data
+
+### Test Accounts Available
+
+#### Admin Account
 - **Email**: admin@cehpoint.com
 - **Password**: admin123
-- **How to Create**: 
-  1. Go to login page
-  2. Click "Create Demo Admin Account" button
-  3. Use the credentials above to login
+- **Access**: Full admin dashboard with all management features
 
-**Important**: If you previously created a demo admin before the password feature was added, clear your browser's localStorage and create it again.
+#### Worker Accounts (All use password: `test123`)
 
-### Worker Accounts
-- Create new worker accounts via the signup page at `/signup`
-- Choose a password during signup
-- Complete knowledge check (60% minimum score required)
-- Complete demo task to qualify for regular projects
+1. **John Anderson** - Senior Full-Stack Developer
+   - Email: john.dev@example.com
+   - Skills: React, Node.js, TypeScript, PostgreSQL
+   - Balance: $1,450.00
+   - Status: Active with completed tasks
 
-### Clearing Data (If Needed)
-To reset the platform:
-1. Open browser console (F12)
-2. Run: `localStorage.clear(); sessionStorage.clear();`
-3. Refresh the page
+2. **Sarah Mitchell** - Mid-Level UI/UX Designer
+   - Email: sarah.designer@example.com
+   - Skills: UI/UX Design, Figma, Adobe XD, Prototyping
+   - Balance: $925.50
+   - Status: Active, currently working on mobile app design
+
+3. **Michael Chen** - Expert Video Editor
+   - Email: mike.editor@example.com
+   - Skills: Video Editing, After Effects, Premiere Pro, Motion Graphics
+   - Balance: $2,340.75
+   - Status: Active, highest earner with multiple completed projects
+
+4. **Emma Rodriguez** - Senior Data Analyst
+   - Email: emma.data@example.com
+   - Skills: Python, Data Analysis, Machine Learning, SQL
+   - Balance: $675.00
+   - Status: Active with recent task completion
+
+5. **Alex Thompson** - Mid-Level Mobile Developer
+   - Email: alex.mobile@example.com
+   - Skills: React Native, Flutter, iOS, Android
+   - Balance: $0.00
+   - Status: Pending approval (new worker)
+
+### Test Data Included
+When you load test accounts, you also get:
+- **6 Realistic Tasks**: Available, in-progress, and completed tasks
+- **8 Payment Records**: Task payments and withdrawals
+- **Realistic Dates**: All data uses proper timestamps
+- **Varied Statuses**: Different account and task states for thorough testing
+
+### Manual Signup Option
+You can still create accounts manually:
+- Go to `/signup` and complete the registration process
+- Pass the AI knowledge verification (60% minimum)
+- Complete demo task to become active
+
+### Resetting Data
+- Click "Load Test Accounts & Data" button again to reset everything
+- Or manually clear storage:
+  ```javascript
+  localStorage.clear();
+  sessionStorage.clear();
+  location.reload();
+  ```
 
 ## Key Features
 
