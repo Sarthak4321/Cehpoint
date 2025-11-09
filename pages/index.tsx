@@ -7,9 +7,8 @@ const Home: NextPage = () => {
   return (
     <div className="min-h-screen">
       <Head>
-        <title>Cehpoint - Project-Based Work Platform</title>
-        <meta name="description" content="Join Cehpoint for flexible project-based work opportunities" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>Cehpoint - Project-Based Work Platform | Earn Weekly with Flexible Projects</title>
+        <meta name="description" content="Join Cehpoint's world-class platform for flexible project-based work. Weekly payouts, global opportunities, and quality projects in software development, video editing, and more." />
       </Head>
 
       <nav className="bg-white shadow-sm">

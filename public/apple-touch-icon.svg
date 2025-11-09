@@ -1,0 +1,13 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="180" height="180" rx="40" fill="url(#gradient)"/>
+  <path d="M90 30C66.804 30 48 48.804 48 72C48 95.196 66.804 114 90 114C113.196 114 132 95.196 132 72C132 48.804 113.196 30 90 30Z" fill="white" fill-opacity="0.2"/>
+  <path d="M105 72L78 84L84 105L105 72Z" fill="white"/>
+  <path d="M72 66L84 78L96 60L72 66Z" fill="white"/>
+  <circle cx="90" cy="90" r="8" fill="white"/>
+  <defs>
+    <linearGradient id="gradient" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#667eea"/>
+      <stop offset="1" stop-color="#764ba2"/>
+    </linearGradient>
+  </defs>
+</svg>
