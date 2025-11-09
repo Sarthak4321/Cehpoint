@@ -1,8 +1,23 @@
 import type { NextConfig } from "next";
-import { env } from "process";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: [env.REPLIT_DOMAINS.split(",")[0]],
+  reactStrictMode: true,
+  devIndicators: {
+    buildActivity: true,
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate',
+          },
+        ],
+      },
+    ];
+  },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
