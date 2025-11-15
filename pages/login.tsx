@@ -1,53 +1,49 @@
-import { useState, useEffect } from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useState, useEffect } from "react";
+import Head from "next/head";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
-import { storage, User } from '../utils/storage';
-import { initializeTestData, resetToTestData } from '../utils/testData';
-import Button from '../components/Button';
+import { storage, User } from "../utils/storage";
+import { initializeTestData, resetToTestData } from "../utils/testData";
+import Button from "../components/Button";
 
-// Firebase auth imports
+// Firebase imports
 import { googleAuth, githubAuth } from "../utils/authProviders";
 import { firebaseLogin } from "../utils/authEmailPassword";
 
 export default function Login() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     initializeTestData();
   }, []);
 
-
-
-  // DEMO ADMIN (unchanged)
-  // =============================================================
+  // ============================================================
+  // CREATE DEMO ADMIN
+  // ============================================================
   const createDemoAdmin = () => {
     const users = storage.getUsers();
-
-    // The admin email you want
     const adminEmail = "sarthakroy902@gmail.com";
 
-    // Check if admin already exists
-    const existingAdmin = users.find(u => u.email === adminEmail);
+    const existingAdmin = users.find((u) => u.email === adminEmail);
 
     if (!existingAdmin) {
       const adminUser: User = {
-        id: 'admin-1',                    // Must be unique
+        id: "admin-1",
         email: adminEmail,
-        password: 'admin123',
-        fullName: 'Admin User',
-        phone: '+1234567890',
+        password: "admin123",
+        fullName: "Admin User",
+        phone: "+1234567890",
         skills: [],
-        experience: 'expert',
-        timezone: 'UTC',
+        experience: "expert",
+        timezone: "UTC",
         preferredWeeklyPayout: 0,
 
-        role: 'admin',
-        accountStatus: 'active',
+        role: "admin",
+        accountStatus: "active",
         knowledgeScore: 100,
         demoTaskCompleted: true,
 
@@ -55,57 +51,44 @@ export default function Login() {
         balance: 0,
       };
 
-      // Save admin to user list
       storage.setUsers([...users, adminUser]);
-
-      alert(
-        `Demo admin created!
-Email: ${adminEmail}
-Password: admin123`
-      );
+      alert(`Admin Created\nEmail: ${adminEmail}\nPassword: admin123`);
     } else {
-      alert(
-        `Admin already exists!
-Email: ${adminEmail}
-Password: admin123`
-      );
+      alert(`Admin already exists:\n${adminEmail}`);
     }
   };
 
-
-  // =============================================================
+  // ============================================================
   // EMAIL + PASSWORD LOGIN
-  // =============================================================
+  // ============================================================
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     const users = storage.getUsers();
+
+    // 1. CHECK FOR LOCAL ADMIN LOGIN
     const admin = users.find(
-      u => u.email === email && u.password === password && u.role === "admin"
+      (u) => u.role === "admin" && u.email === email && u.password === password
     );
 
-    // If admin found → skip Firebase login
     if (admin) {
       storage.setCurrentUser(admin);
-      router.push("<admin/index");
+      router.push("/admin"); // FIXED
       return;
     }
 
-    // Otherwise → Firebase login for normal users
+    // 2. NORMAL WORKER LOGIN (Firebase)
     try {
       const result = await firebaseLogin(email, password);
 
-      // Allow admin login without email verification
+      // If Firebase user is NOT verified → block login
       if (!result.user.emailVerified) {
-        if (result.user.email !== "sarthakroy902@gmail.com") {
-          setError("Please verify your email before logging in.");
-          return;
-        }
+        setError("Please verify your email before logging in.");
+        return;
       }
 
-
-      // Store user...
+      // Create a complete user object
       const loggedInUser: User = {
         id: result.user.uid,
         email: result.user.email || "",
@@ -116,37 +99,39 @@ Password: admin123`
         experience: "",
         timezone: "",
         preferredWeeklyPayout: 0,
+
         role: "worker",
         accountStatus: "active",
         knowledgeScore: 0,
         demoTaskCompleted: false,
+
         createdAt: new Date().toISOString(),
         balance: 0,
       };
 
       storage.setCurrentUser(loggedInUser);
       router.push("/dashboard");
-
     } catch (err) {
+      console.error(err);
       setError("Invalid email or password");
     }
   };
 
-
-  // =============================================================
+  // ============================================================
   // GOOGLE LOGIN
-  // =============================================================
+  // ============================================================
   const handleGoogleLogin = async () => {
     try {
       const result = await googleAuth();
       const user = result.user;
 
       const users = storage.getUsers();
-      const existing = users.find(u => u.email === user.email);
+      const existing = users.find((u) => u.email === user.email);
 
       if (existing) {
         storage.setCurrentUser(existing);
-        return router.push("/dashboard");
+        router.push(existing.role === "admin" ? "/admin" : "/dashboard");
+        return;
       }
 
       const newUser: User = {
@@ -172,28 +157,27 @@ Password: admin123`
       storage.setUsers([...users, newUser]);
       storage.setCurrentUser(newUser);
       router.push("/dashboard");
-
     } catch (err) {
       console.error(err);
       alert("Google login failed");
     }
   };
 
-
-  // =============================================================
+  // ============================================================
   // GITHUB LOGIN
-  // =============================================================
+  // ============================================================
   const handleGithubLogin = async () => {
     try {
       const result = await githubAuth();
       const user = result.user;
 
       const users = storage.getUsers();
-      const existing = users.find(u => u.email === user.email);
+      const existing = users.find((u) => u.email === user.email);
 
       if (existing) {
         storage.setCurrentUser(existing);
-        return router.push("/dashboard");
+        router.push(existing.role === "admin" ? "/admin" : "/dashboard");
+        return;
       }
 
       const newUser: User = {
@@ -219,19 +203,15 @@ Password: admin123`
       storage.setUsers([...users, newUser]);
       storage.setCurrentUser(newUser);
       router.push("/dashboard");
-
     } catch (err) {
       console.error(err);
       alert("GitHub login failed");
     }
   };
 
-
-  // =============================================================
-
-
-
-
+  // ============================================================
+  // UI
+  // ============================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50/30 flex items-center justify-center py-12 px-4">
       <Head>
@@ -245,8 +225,12 @@ Password: admin123`
               Cehpoint
             </span>
           </Link>
-          <h1 className="text-4xl font-black mt-6 text-gray-900">Welcome Back</h1>
-          <p className="text-gray-600 mt-3 text-lg">Login to continue your journey</p>
+          <h1 className="text-4xl font-black mt-6 text-gray-900">
+            Welcome Back
+          </h1>
+          <p className="text-gray-600 mt-3 text-lg">
+            Login to continue your journey
+          </p>
         </div>
 
         <div className="glass-card rounded-3xl premium-shadow p-10">
@@ -272,7 +256,11 @@ Password: admin123`
                 onClick={handleGithubLogin}
                 className="w-full flex items-center justify-center gap-2 bg-black text-white px-5 py-3 rounded-xl shadow hover:bg-gray-800 transition"
               >
-                <img src="/github.png" alt="github" className="w-5 h-5 invert" />
+                <img
+                  src="/github.png"
+                  alt="github"
+                  className="w-5 h-5 invert"
+                />
                 <span className="font-medium">Sign in with GitHub</span>
               </button>
             </div>
@@ -284,19 +272,23 @@ Password: admin123`
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-3 text-gray-700">Email Address</label>
+              <label className="block text-sm font-bold mb-3 text-gray-700">
+                Email Address
+              </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-5 py-4 premium-input rounded-xl text-base font-medium"
-                placeholder="your@email.com"
+                placeholder="you@email.com"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-3 text-gray-700">Password</label>
+              <label className="block text-sm font-bold mb-3 text-gray-700">
+                Password
+              </label>
               <input
                 type="password"
                 value={password}
@@ -314,8 +306,11 @@ Password: admin123`
 
           <div className="mt-8 text-center">
             <p className="text-base text-gray-600">
-              Don't have an account?{' '}
-              <Link href="/signup" className="text-indigo-600 font-bold hover:text-indigo-700 hover:underline transition-all">
+              Don't have an account?{" "}
+              <Link
+                href="/signup"
+                className="text-indigo-600 font-bold hover:text-indigo-700 hover:underline transition-all"
+              >
                 Sign Up Free
               </Link>
             </p>
@@ -337,7 +332,6 @@ Password: admin123`
               </button>
             </div>
           </div>
-
         </div>
       </div>
     </div>
