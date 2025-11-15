@@ -88,7 +88,7 @@ Password: admin123`
     // If admin found → skip Firebase login
     if (admin) {
       storage.setCurrentUser(admin);
-      router.push("/admin");
+      router.push("<admin/index");
       return;
     }
 
