@@ -2,9 +2,14 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+
 import { storage } from '../utils/storage';
 import { initializeTestData, resetToTestData } from '../utils/testData';
 import Button from '../components/Button';
+
+// Firebase auth imports
+import { googleAuth, githubAuth } from "../utils/authProviders";
+import { firebaseLogin } from "../utils/authEmailPassword";
 
 export default function Login() {
   const router = useRouter();
@@ -16,36 +21,146 @@ export default function Login() {
     initializeTestData();
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  // ===========================================
+  // EMAIL + PASSWORD LOGIN
+  // ===========================================
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
-    const users = storage.getUsers();
-    const user = users.find(u => u.email === email);
+    try {
+      const result = await firebaseLogin(email, password);
 
-    if (!user) {
-      setError('Invalid email or password');
-      return;
-    }
+      if (!result.user.emailVerified) {
+        setError("Please verify your email before logging in.");
+        return;
+      }
 
-    if (user.password !== password) {
-      setError('Invalid email or password');
-      return;
-    }
+      // Store user in local storage (FULL structure for dashboard)
+      storage.setCurrentUser({
+        id: result.user.uid,
+        email: result.user.email!,
+        fullName: result.user.displayName || "",
+        role: "worker",
+        accountStatus: "active",
+        createdAt: new Date().toISOString(),
 
-    storage.setCurrentUser(user);
+        // Prevent dashboard crash
+        skills: [],
+        experience: "",
+        phone: "",
+        timezone: "",
+        preferredWeeklyPayout: 0,
+        balance: 0,
+      });
 
-    if (user.role === 'admin') {
-      router.push('/admin');
-    } else {
-      router.push('/dashboard');
+      router.push("/dashboard");
+
+    } catch (err: any) {
+      console.error(err);
+      setError("Invalid email or password");
     }
   };
 
+
+  // ===========================================
+  // GOOGLE LOGIN
+  // ===========================================
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await googleAuth();
+      const user = result.user;
+
+      const users = storage.getUsers();
+      const existing = users.find(u => u.email === user.email);
+
+      if (existing) {
+        storage.setCurrentUser(existing);
+        return router.push("/dashboard");
+      }
+
+      // Create new user if not exists
+      const newUser = {
+        id: user.uid,
+        email: user.email || "",
+        fullName: user.displayName || "",
+        password: "",
+        role: "worker",
+        accountStatus: "active",
+        createdAt: new Date().toISOString(),
+
+        // Dashboard-safe fields
+        skills: [],
+        experience: "",
+        phone: "",
+        timezone: "",
+        preferredWeeklyPayout: 0,
+        balance: 0,
+      };
+
+      storage.setUsers([...users, newUser]);
+      storage.setCurrentUser(newUser);
+      router.push("/dashboard");
+
+    } catch (err) {
+      console.error(err);
+      alert("Google login failed");
+    }
+  };
+
+
+  // ===========================================
+  // GITHUB LOGIN
+  // ===========================================
+  const handleGithubLogin = async () => {
+    try {
+      const result = await githubAuth();
+      const user = result.user;
+
+      const users = storage.getUsers();
+      const existing = users.find(u => u.email === user.email);
+
+      if (existing) {
+        storage.setCurrentUser(existing);
+        return router.push("/dashboard");
+      }
+
+      const newUser = {
+        id: user.uid,
+        email: user.email || "",
+        fullName: user.displayName || "",
+        password: "",
+        role: "worker",
+        accountStatus: "active",
+        createdAt: new Date().toISOString(),
+
+        skills: [],
+        experience: "",
+        phone: "",
+        timezone: "",
+        preferredWeeklyPayout: 0,
+        balance: 0,
+      };
+
+      storage.setUsers([...users, newUser]);
+      storage.setCurrentUser(newUser);
+      router.push("/dashboard");
+
+    } catch (err) {
+      console.error(err);
+      alert("GitHub login failed");
+    }
+  };
+
+
+
+  // ===========================================
+  // DEMO ADMIN (unchanged)
+  // ===========================================
   const createDemoAdmin = () => {
     const users = storage.getUsers();
     const existingAdmin = users.find(u => u.email === 'admin@cehpoint.com');
-    
+
     if (!existingAdmin) {
       const adminUser = {
         id: 'admin-1',
@@ -57,8 +172,8 @@ export default function Login() {
         experience: 'expert',
         timezone: 'UTC',
         preferredWeeklyPayout: 0,
-        accountStatus: 'active' as const,
-        role: 'admin' as const,
+        accountStatus: 'active',
+        role: 'admin',
         knowledgeScore: 100,
         demoTaskCompleted: true,
         createdAt: new Date().toISOString(),
@@ -70,6 +185,8 @@ export default function Login() {
       alert('Admin already exists!\nEmail: admin@cehpoint.com\nPassword: admin123');
     }
   };
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50/30 flex items-center justify-center py-12 px-4">
@@ -88,6 +205,7 @@ export default function Login() {
           <p className="text-gray-600 mt-3 text-lg">Login to continue your journey</p>
         </div>
 
+
         <div className="glass-card rounded-3xl premium-shadow p-10">
           <form onSubmit={handleLogin} className="space-y-6">
             {error && (
@@ -95,6 +213,32 @@ export default function Login() {
                 {error}
               </div>
             )}
+
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 px-5 py-3 rounded-xl shadow-sm hover:bg-gray-50 transition"
+              >
+                <img src="/google.png" className="w-5 h-5" />
+                <span className="font-medium">Sign in with Google</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleGithubLogin}
+                className="w-full flex items-center justify-center gap-2 bg-black text-white px-5 py-3 rounded-xl shadow hover:bg-gray-800 transition"
+              >
+                <img src="/github.png" className="w-5 h-5 invert" />
+                <span className="font-medium">Sign in with GitHub</span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-gray-300" />
+              <span className="text-sm text-gray-500">or</span>
+              <div className="flex-1 h-px bg-gray-300" />
+            </div>
 
             <div>
               <label className="block text-sm font-bold mb-3 text-gray-700">Email Address</label>
