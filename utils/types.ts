@@ -2,51 +2,66 @@
 export type AccountStatus = "pending" | "active" | "suspended" | "terminated";
 export type UserRole = "worker" | "admin";
 
-export interface User {
-  id: string; // firestore doc id or uid
-  email: string;
-  password?: string; // only if you want to store (not recommended) — here kept for compatibility
-  fullName: string;
-  phone?: string;
-  skills: string[];
-  experience?: string;
-  timezone?: string;
-  preferredWeeklyPayout?: number;
-  role: UserRole;
-  accountStatus: AccountStatus;
-  knowledgeScore?: number;
-  demoTaskCompleted?: boolean;
-  createdAt: string;
-  balance?: number;
-}
+// utils/types.ts
 
-export type TaskStatus = "available" | "in-progress" | "completed";
+export interface User {
+  id: string;
+  email: string;
+  password: string;
+  fullName: string;
+  phone: string;
+  skills: string[];
+  experience: string;
+  timezone: string;
+  preferredWeeklyPayout: number;
+  role: "worker" | "admin";
+  accountStatus: "pending" | "active" | "suspended" | "terminated";
+  knowledgeScore: number;
+  demoTaskCompleted: boolean;
+  createdAt: string;
+  balance: number;
+}
 
 export interface Task {
   id: string;
   title: string;
-  description?: string;
-  category?: string;
+  description: string;
+  category: string;
   skills: string[];
   weeklyPayout: number;
-  status: TaskStatus;
-  assignedTo?: string; // userId
+  deadline: string;
+
+  status: "available" | "in-progress" | "submitted" | "completed" | "rejected";
+  assignedTo: string | null;
+  submissionUrl?: string;
+  feedback?: string;
+
+  createdBy: string;
   createdAt: string;
+  completedAt?: string;
 }
 
 export interface DailySubmission {
-  [x: string]: any;
   id: string;
   userId: string;
   date: string;
-
-  githubCommitUrl: string;   // <— ADD
-  videoUrl: string;          // <— ADD
-
+  githubCommitUrl?: string;
+  videoUrl?: string;
   description: string;
   workType: string;
   hoursWorked: number;
-
   createdAt: string;
   adminReviewed: boolean;
+  adminFeedback?: string;
+}
+
+export interface Payment {
+  id: string;
+  userId: string;
+  amount: number;
+  type: "task-payment" | "manual" | "bonus";
+  status: "pending" | "completed" | "failed";
+  taskId?: string;
+  createdAt: string;
+  completedAt?: string;
 }
