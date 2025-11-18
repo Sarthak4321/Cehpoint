@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+
 import { LogOut, User, Briefcase, Settings, DollarSign, Home, Calendar } from 'lucide-react';
-import { storage, User as UserType } from '../utils/storage';
+
+import { storage } from '../utils/storage';
+import type { User as UserType } from '../utils/types';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -18,7 +21,7 @@ export default function Layout({ children }: LayoutProps) {
   }, [router.pathname]);
 
   const handleLogout = () => {
-    storage.setCurrentUser(null);
+    storage.removeCurrentUser();
     router.push('/');
   };
 
@@ -48,12 +51,14 @@ export default function Layout({ children }: LayoutProps) {
                       <span>Dashboard</span>
                     </button>
                   </Link>
+
                   <Link href="/tasks">
                     <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition">
                       <Briefcase size={18} />
                       <span>Tasks</span>
                     </button>
                   </Link>
+
                   <Link href="/payments">
                     <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition">
                       <DollarSign size={18} />
@@ -71,18 +76,21 @@ export default function Layout({ children }: LayoutProps) {
                       <span>Dashboard</span>
                     </button>
                   </Link>
+
                   <Link href="/admin/workers">
                     <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition">
                       <User size={18} />
                       <span>Workers</span>
                     </button>
                   </Link>
+
                   <Link href="/admin/daily-work">
                     <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition">
                       <Calendar size={18} />
                       <span>Daily Work</span>
                     </button>
                   </Link>
+
                   <Link href="/admin/tasks">
                     <button className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition">
                       <Briefcase size={18} />
@@ -99,6 +107,7 @@ export default function Layout({ children }: LayoutProps) {
                   <p className="text-sm font-medium text-gray-900">{user.fullName}</p>
                   <p className="text-xs text-gray-500">{user.role}</p>
                 </div>
+
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition"
