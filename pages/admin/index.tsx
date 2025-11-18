@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
+
 import Layout from "../../components/Layout";
 import Card from "../../components/Card";
 
 import { Users, Briefcase, Calendar, Clock } from "lucide-react";
 
-import { storage, User, Task } from "../../utils/storage";
+import { storage } from "../../utils/storage";
+import type { User, Task } from "../../utils/types";
+
 import { db } from "../../utils/firebase";
 import { collection, getDocs } from "firebase/firestore";
+
 
 export default function AdminDashboard() {
   const router = useRouter();
