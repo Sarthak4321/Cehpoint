@@ -440,7 +440,6 @@
 
 
 
-
 import { useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
@@ -473,13 +472,11 @@ export default function Login() {
       const result = await firebaseLogin(email, password);
       const uid = result.user.uid;
 
-      // Require email verification
       if (!result.user.emailVerified) {
         setError("Please verify your email first.");
         return;
       }
 
-      // Load profile from Firestore
       const userRef = doc(db, "users", uid);
       const snap = await getDoc(userRef);
 
@@ -488,19 +485,37 @@ export default function Login() {
         return;
       }
 
-      const userData = snap.data();
+      const user = snap.data();
 
-      // Sync Firestore emailVerified field
-      if (userData.emailVerified === false && result.user.emailVerified) {
+      // If Firestore has emailVerified = false but Firebase says true → update
+      if (user.emailVerified === false && result.user.emailVerified) {
         await updateDoc(userRef, { emailVerified: true });
-        userData.emailVerified = true;
+        user.emailVerified = true;
       }
 
-      // Save session using your global storage wrapper
-      storage.setCurrentUser({ ...userData, id: uid });
+      // SAVE SESSION
+      storage.setCurrentUser({
+        id: uid,
+        email: user.email || "",
+        fullName: user.fullName || "",
+        role: user.role || "worker",
+        accountStatus: user.accountStatus || "pending",
+        skills: user.skills || [],
+        balance: user.balance || 0,
+        phone: user.phone || "",
+        experience: user.experience || "",
+        timezone: user.timezone || "",
+        preferredWeeklyPayout: user.preferredWeeklyPayout || 0,
+        emailVerified: user.emailVerified ?? true,
+        createdAt: user.createdAt || new Date().toISOString(),
+        password: "",
+        knowledgeScore: 0,
+        demoTaskCompleted: false
+      });
 
-      // Redirect
-      router.push(userData.role === "admin" ? "/admin" : "/dashboard");
+      // REDIRECT
+      router.push(user.role === "admin" ? "/admin" : "/dashboard");
+
     } catch (err) {
       console.error(err);
       setError("Invalid email or password.");
@@ -516,7 +531,6 @@ export default function Login() {
       const uid = result.user.uid;
 
       const snap = await getDoc(doc(db, "users", uid));
-
       if (!snap.exists()) {
         setError("Account does not exist. Please sign up first.");
         return;
@@ -524,7 +538,25 @@ export default function Login() {
 
       const user = snap.data();
 
-      storage.setCurrentUser({ ...user, id: uid });
+      storage.setCurrentUser({
+        id: uid,
+        email: user.email || "",
+        fullName: user.fullName || "",
+        role: user.role || "worker",
+        accountStatus: user.accountStatus || "pending",
+        phone: user.phone || "",
+        experience: user.experience || "",
+        timezone: user.timezone || "",
+        skills: user.skills || [],
+        balance: user.balance || 0,
+        preferredWeeklyPayout: user.preferredWeeklyPayout || 0,
+        emailVerified: user.emailVerified ?? false,
+        createdAt: user.createdAt || new Date().toISOString(),
+        password: "",
+        knowledgeScore: 0,
+        demoTaskCompleted: false
+      });
+
 
       router.push(user.role === "admin" ? "/admin" : "/dashboard");
     } catch (err) {
@@ -542,7 +574,6 @@ export default function Login() {
       const uid = result.user.uid;
 
       const snap = await getDoc(doc(db, "users", uid));
-
       if (!snap.exists()) {
         setError("Account does not exist. Please sign up first.");
         return;
@@ -550,7 +581,24 @@ export default function Login() {
 
       const user = snap.data();
 
-      storage.setCurrentUser({ ...user, id: uid });
+    storage.setCurrentUser({
+      id: uid,
+      email: user.email || "",
+      fullName: user.fullName || "",
+      role: user.role || "worker",
+      accountStatus: user.accountStatus || "pending",
+      phone: user.phone || "",
+      experience: user.experience || "",
+      timezone: user.timezone || "",
+      skills: user.skills || [],
+      balance: user.balance || 0,
+      preferredWeeklyPayout: user.preferredWeeklyPayout || 0,
+      emailVerified: user.emailVerified ?? false,
+      createdAt: user.createdAt || new Date().toISOString(),
+      password: "",
+      knowledgeScore: 0,
+      demoTaskCompleted: false
+    });
 
       router.push(user.role === "admin" ? "/admin" : "/dashboard");
     } catch (err) {
@@ -577,6 +625,7 @@ export default function Login() {
             </div>
           )}
 
+          {/* Google */}
           <button
             type="button"
             onClick={handleGoogleLogin}
@@ -586,6 +635,7 @@ export default function Login() {
             <span className="font-medium">Sign in with Google</span>
           </button>
 
+          {/* GitHub */}
           <button
             type="button"
             onClick={handleGithubLogin}
