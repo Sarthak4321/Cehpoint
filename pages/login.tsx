@@ -473,7 +473,7 @@ export default function Login() {
       const uid = result.user.uid;
 
       // Always refresh the Firebase user to get correct emailVerified status
-      await result.user.reload();
+    
 
       if (!result.user.emailVerified) {
         setError("Please verify your email first.");
