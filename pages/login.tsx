@@ -472,10 +472,14 @@ export default function Login() {
       const result = await firebaseLogin(email, password);
       const uid = result.user.uid;
 
+      // Always refresh the Firebase user to get correct emailVerified status
+      await result.user.reload();
+
       if (!result.user.emailVerified) {
         setError("Please verify your email first.");
         return;
       }
+
 
       const userRef = doc(db, "users", uid);
       const snap = await getDoc(userRef);
@@ -581,24 +585,24 @@ export default function Login() {
 
       const user = snap.data();
 
-    storage.setCurrentUser({
-      id: uid,
-      email: user.email || "",
-      fullName: user.fullName || "",
-      role: user.role || "worker",
-      accountStatus: user.accountStatus || "pending",
-      phone: user.phone || "",
-      experience: user.experience || "",
-      timezone: user.timezone || "",
-      skills: user.skills || [],
-      balance: user.balance || 0,
-      preferredWeeklyPayout: user.preferredWeeklyPayout || 0,
-      emailVerified: user.emailVerified ?? false,
-      createdAt: user.createdAt || new Date().toISOString(),
-      password: "",
-      knowledgeScore: 0,
-      demoTaskCompleted: false
-    });
+      storage.setCurrentUser({
+        id: uid,
+        email: user.email || "",
+        fullName: user.fullName || "",
+        role: user.role || "worker",
+        accountStatus: user.accountStatus || "pending",
+        phone: user.phone || "",
+        experience: user.experience || "",
+        timezone: user.timezone || "",
+        skills: user.skills || [],
+        balance: user.balance || 0,
+        preferredWeeklyPayout: user.preferredWeeklyPayout || 0,
+        emailVerified: user.emailVerified ?? false,
+        createdAt: user.createdAt || new Date().toISOString(),
+        password: "",
+        knowledgeScore: 0,
+        demoTaskCompleted: false
+      });
 
       router.push(user.role === "admin" ? "/admin" : "/dashboard");
     } catch (err) {
