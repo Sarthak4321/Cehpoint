@@ -497,23 +497,7 @@ export default function Login() {
       }
 
       // Save session using your global storage wrapper
-      storage.setCurrentUser({
-        ...userData, id: uid,
-        email: "",
-        password: "",
-        fullName: "",
-        phone: "",
-        skills: [],
-        experience: "",
-        timezone: "",
-        preferredWeeklyPayout: 0,
-        role: "admin",
-        accountStatus: "pending",
-        knowledgeScore: 0,
-        demoTaskCompleted: false,
-        createdAt: "",
-        balance: 0
-      });
+      storage.setCurrentUser({ ...userData, id: uid });
 
       // Redirect
       router.push(userData.role === "admin" ? "/admin" : "/dashboard");
@@ -540,23 +524,7 @@ export default function Login() {
 
       const user = snap.data();
 
-      storage.setCurrentUser({
-        ...user, id: uid,
-        email: "",
-        password: "",
-        fullName: "",
-        phone: "",
-        skills: [],
-        experience: "",
-        timezone: "",
-        preferredWeeklyPayout: 0,
-        role: "admin",
-        accountStatus: "pending",
-        knowledgeScore: 0,
-        demoTaskCompleted: false,
-        createdAt: "",
-        balance: 0
-      });
+      storage.setCurrentUser({ ...user, id: uid });
 
       router.push(user.role === "admin" ? "/admin" : "/dashboard");
     } catch (err) {
@@ -582,23 +550,7 @@ export default function Login() {
 
       const user = snap.data();
 
-      storage.setCurrentUser({
-        ...user, id: uid,
-        email: "",
-        password: "",
-        fullName: "",
-        phone: "",
-        skills: [],
-        experience: "",
-        timezone: "",
-        preferredWeeklyPayout: 0,
-        role: "admin",
-        accountStatus: "pending",
-        knowledgeScore: 0,
-        demoTaskCompleted: false,
-        createdAt: "",
-        balance: 0
-      });
+      storage.setCurrentUser({ ...user, id: uid });
 
       router.push(user.role === "admin" ? "/admin" : "/dashboard");
     } catch (err) {
