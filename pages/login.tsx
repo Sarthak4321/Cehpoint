@@ -11,6 +11,7 @@ import { googleAuth, githubAuth } from "../utils/authProviders";
 import { db } from "../utils/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { storage } from "../utils/storage";
+import { User } from "../utils/types";
 
 export default function Login() {
   const router = useRouter();
@@ -52,11 +53,28 @@ export default function Login() {
       }
 
       /* 🚨 FIX — Save session using storage wrapper */
-      storage.setCurrentUser({
-        id: uid,
-        ...user,
-        password: "",
-      });
+const fullUser: User = {
+  id: uid,
+  email: user.email || "",
+  fullName: user.fullName || "",
+  password: "",
+  phone: user.phone || "",
+  skills: user.skills || [],
+  experience: user.experience || "",
+  timezone: user.timezone || "",
+  preferredWeeklyPayout: user.preferredWeeklyPayout || 0,
+  role: user.role || "worker",
+  accountStatus: user.accountStatus || "pending",
+  knowledgeScore: user.knowledgeScore || 0,
+  demoTaskCompleted: user.demoTaskCompleted || false,
+  demoTaskScore: user.demoTaskScore || 0,
+  createdAt: user.createdAt || new Date().toISOString(),
+  balance: user.balance || 0,
+  emailVerified: user.emailVerified ?? true,
+};
+
+storage.setCurrentUser(fullUser);
+
 
       router.push(user.role === "admin" ? "/admin" : "/dashboard");
     } catch (err) {
@@ -82,11 +100,27 @@ export default function Login() {
       const user = snap.data();
 
       /** SAVE SESSION */
-      storage.setCurrentUser({
+      const fullUser: User = {
         id: uid,
-        ...user,
+        email: user.email || "",
+        fullName: user.fullName || "",
         password: "",
-      });
+        phone: user.phone || "",
+        skills: user.skills || [],
+        experience: user.experience || "",
+        timezone: user.timezone || "",
+        preferredWeeklyPayout: user.preferredWeeklyPayout || 0,
+        role: user.role || "worker",
+        accountStatus: user.accountStatus || "pending",
+        knowledgeScore: user.knowledgeScore || 0,
+        demoTaskCompleted: user.demoTaskCompleted || false,
+        demoTaskScore: user.demoTaskScore || 0,
+        createdAt: user.createdAt || new Date().toISOString(),
+        balance: user.balance || 0,
+        emailVerified: user.emailVerified ?? true,
+      };
+
+      storage.setCurrentUser(fullUser);
 
       router.push(user.role === "admin" ? "/admin" : "/dashboard");
     } catch (err) {
@@ -112,11 +146,27 @@ export default function Login() {
       const user = snap.data();
 
       /** SAVE SESSION */
-      storage.setCurrentUser({
-        id: uid,
-        ...user,
-        password: "",
-      });
+const fullUser: User = {
+  id: uid,
+  email: user.email || "",
+  fullName: user.fullName || "",
+  password: "",
+  phone: user.phone || "",
+  skills: user.skills || [],
+  experience: user.experience || "",
+  timezone: user.timezone || "",
+  preferredWeeklyPayout: user.preferredWeeklyPayout || 0,
+  role: user.role || "worker",
+  accountStatus: user.accountStatus || "pending",
+  knowledgeScore: user.knowledgeScore || 0,
+  demoTaskCompleted: user.demoTaskCompleted || false,
+  demoTaskScore: user.demoTaskScore || 0,
+  createdAt: user.createdAt || new Date().toISOString(),
+  balance: user.balance || 0,
+  emailVerified: user.emailVerified ?? true,
+};
+
+storage.setCurrentUser(fullUser);
 
       router.push(user.role === "admin" ? "/admin" : "/dashboard");
     } catch (err) {
