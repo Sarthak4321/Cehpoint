@@ -287,17 +287,22 @@ export default function Tasks() {
     const submission = prompt("Enter your submission URL or description:");
     if (!submission) return;
 
-    // Save to Firestore
-    await storage.updateTask(taskId, {
-      status: "submitted",
-      submittedAt: new Date().toISOString(),
-      submissionUrl: submission,
-    });
+    try {
+      await storage.updateTask(taskId, {
+        status: "submitted",
+        submittedAt: new Date().toISOString(),
+        submissionUrl: submission,
+      });
 
-    alert("Task submitted successfully. Awaiting review.");
+      alert("Task submitted successfully. Awaiting review.");
 
-    if (user) loadTasks(user.id);
+      if (user) loadTasks(user.id);
+    } catch (err) {
+      console.error("submit error:", err);
+      alert("Failed to submit task.");
+    }
   };
+
 
   const filteredTasks =
     filter === "all" ? tasks : tasks.filter((t) => t.status === filter);
@@ -323,11 +328,10 @@ export default function Tasks() {
                     status as "all" | "in-progress" | "submitted" | "completed"
                   )
                 }
-                className={`px-4 py-2 rounded-lg ${
-                  filter === status
+                className={`px-4 py-2 rounded-lg ${filter === status
                     ? "bg-indigo-600 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 {status.charAt(0).toUpperCase() + status.slice(1)}
               </button>
@@ -350,13 +354,12 @@ export default function Tasks() {
                       <h3 className="text-xl font-semibold">{task.title}</h3>
 
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          task.status === "completed"
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${task.status === "completed"
                             ? "bg-green-100 text-green-700"
                             : task.status === "submitted"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-orange-100 text-orange-700"
-                        }`}
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-orange-100 text-orange-700"
+                          }`}
                       >
                         {task.status}
                       </span>
